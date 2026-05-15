@@ -1,156 +1,69 @@
-<!-- =========================
-BESTAND 2 = scoreboard.html
-========================= -->
-
 <!DOCTYPE html>
 <html lang="nl">
 <head>
-
 <meta charset="UTF-8">
-
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-<title>Eurovision Scoreboard</title>
-
+<title>Eurovision - Scoreboard</title>
 <style>
+:root{--bg1:#12051f;--bg2:#351362;--rank:#6200d9;--name:#d400ff;--pts:#fff;--ink:#1f0930}
+*{box-sizing:border-box}
+body{margin:0;font-family:Arial,sans-serif;background:radial-gradient(circle at top,var(--bg2),var(--bg1));color:#fff;min-height:100vh;overflow:hidden}
+.container{width:min(1200px,94vw);margin:auto;padding-top:24px}
+.header{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-bottom:18px}
+.title{font-size:clamp(30px,5vw,56px);font-weight:900;letter-spacing:.8px;text-shadow:0 8px 30px rgba(255,0,204,.35)}
+.live{background:linear-gradient(90deg,#ff2679,#ff47d0);padding:10px 14px;border-radius:999px;font-weight:800}
+.board{display:flex;flex-direction:column;gap:10px;max-height:78vh;overflow:auto;padding-right:6px}
+.row{display:grid;grid-template-columns:84px 1fr 130px;align-items:stretch;border-radius:16px;overflow:hidden;animation:reveal .5s ease both;box-shadow:0 10px 30px rgba(0,0,0,.25)}
+.rank{background:linear-gradient(180deg,#7b2cff,var(--rank));padding:16px;text-align:center;font-weight:900;font-size:26px}
+.name{background:linear-gradient(90deg,#c100ff,var(--name));padding:16px 20px;font-size:28px;font-weight:800}
+.points{background:var(--pts);color:var(--ink);padding:16px;text-align:center;font-size:34px;font-weight:900}
+.row.top-1 .rank,.row.top-1 .name{background:linear-gradient(90deg,#ff9f1c,#ffd166);color:#3b2100}
+.row.top-2 .rank,.row.top-2 .name{background:linear-gradient(90deg,#b8c4d6,#edf2f4);color:#1d2736}
+.row.top-3 .rank,.row.top-3 .name{background:linear-gradient(90deg,#c97a40,#f4a261);color:#261207}
+@keyframes reveal{from{opacity:0;transform:translateX(-25px)}to{opacity:1;transform:translateX(0)}}
+.empty{padding:42px;text-align:center;background:rgba(255,255,255,.08);border-radius:16px;font-size:24px}
 
-body{
-    margin:0;
-    font-family:Arial;
-    background:
-    radial-gradient(circle at top,#401060,#12051f);
-    color:white;
-    overflow:hidden;
-}
-
-.container{
-    width:90%;
-    margin:auto;
-    padding-top:30px;
-}
-
-.title{
-    text-align:center;
-    font-size:50px;
-    font-weight:bold;
-    margin-bottom:30px;
-    color:white;
-}
-
-.board{
-    display:flex;
-    flex-direction:column;
-    gap:10px;
-}
-
-.row{
-    display:flex;
-    align-items:center;
-    animation:fade .5s;
-}
-
-.rank{
-    width:70px;
-    background:#5a189a;
-    padding:15px;
-    text-align:center;
-    font-weight:bold;
-    font-size:24px;
-}
-
-.name{
-    flex:1;
-    background:#d000ff;
-    padding:15px;
-    font-size:24px;
-}
-
-.points{
-    width:120px;
-    background:white;
-    color:black;
-    padding:15px;
-    text-align:center;
-    font-size:28px;
-    font-weight:bold;
-}
-
-@keyframes fade{
-    from{
-        opacity:0;
-        transform:translateY(10px);
-    }
-
-    to{
-        opacity:1;
-        transform:translateY(0);
-    }
-}
+.topnav{position:sticky;top:0;z-index:20;display:flex;gap:8px;flex-wrap:wrap;padding:10px;margin:0 0 12px;background:rgba(7,2,13,.55);backdrop-filter:blur(6px);border-radius:12px}
+.topnav a{text-decoration:none;color:#fff;padding:8px 12px;border-radius:999px;background:rgba(255,255,255,.12);font-weight:700}
+.topnav a.active{background:linear-gradient(90deg,#ff2fcf,#7300ff)}
 
 </style>
-
 </head>
-
 <body>
+<div class="topnav">
+  <a class="" href="admin.html">Admin</a>
+  <a class="" href="names.html">Namen</a>
+  <a class="active" href="scoreboard.html">Scoreboard</a>
+  <a href="index.html">Menu</a>
+</div>
 
 <div class="container">
-
-<div class="title">
-🎤 EUROVISION CLASS VOTING
+  <div class="header">
+    <div class="title">🏆 LIVE SCOREBOARD</div>
+    <div class="live">EUROVISION STYLE</div>
+  </div>
+  <div class="board" id="board"></div>
 </div>
-
-<div class="board" id="board"></div>
-
-</div>
-
 <script>
-
 function loadBoard(){
-
-    const data=JSON.parse(
-        localStorage.getItem("eurovisionData")
-    );
-
-    if(!data || !data.contestants) return;
-
-    const sorted=[...data.contestants]
-    .sort((a,b)=>b.total-a.total);
-
-    const board=document.getElementById("board");
-
-    board.innerHTML="";
-
-    sorted.forEach((c,i)=>{
-
-        board.innerHTML += `
-
-        <div class="row">
-
-            <div class="rank">
-                ${String(i+1).padStart(2,"0")}
-            </div>
-
-            <div class="name">
-                ${c.name}
-            </div>
-
-            <div class="points">
-                ${c.total}
-            </div>
-
-        </div>
-
-        `;
-
-    });
-
+  const data=JSON.parse(localStorage.getItem('eurovisionData'));
+  const board=document.getElementById('board');
+  board.innerHTML='';
+  if(!data || !data.contestants || data.contestants.length===0){
+    board.innerHTML='<div class="empty">Nog geen scoredata beschikbaar.</div>';
+    return;
+  }
+  const sorted=[...data.contestants].sort((a,b)=>b.total-a.total||a.name.localeCompare(b.name,'nl'));
+  sorted.forEach((c,i)=>{
+    const row=document.createElement('div');
+    row.className=`row ${i===0?'top-1':i===1?'top-2':i===2?'top-3':''}`;
+    row.style.animationDelay=`${i*0.05}s`;
+    row.innerHTML=`<div class="rank">${String(i+1).padStart(2,'0')}</div><div class="name">${c.name}</div><div class="points">${c.total}</div>`;
+    board.appendChild(row);
+  });
 }
-
 loadBoard();
-
 setInterval(loadBoard,1000);
-
 </script>
-
 </body>
 </html>
