@@ -14,23 +14,10 @@ button{padding:12px 20px;border:none;border-radius:10px;cursor:pointer;font-size
 .secondary{background:#444;color:white}
 select,input{padding:10px;border-radius:10px;font-size:16px;margin:5px;border:none}
 .row{margin-top:10px;display:flex;flex-wrap:wrap;align-items:center}
-.current{background:#2d1650;padding:15px;border-radius:10px;margin-top:10px}
 .note{opacity:.85;margin-top:8px}
-
-.topnav{position:sticky;top:0;z-index:20;display:flex;gap:8px;flex-wrap:wrap;padding:10px;margin:0 0 12px;background:rgba(7,2,13,.55);backdrop-filter:blur(6px);border-radius:12px}
-.topnav a{text-decoration:none;color:#fff;padding:8px 12px;border-radius:999px;background:rgba(255,255,255,.12);font-weight:700}
-.topnav a.active{background:linear-gradient(90deg,#ff2fcf,#7300ff)}
-
 </style>
 </head>
 <body>
-<div class="topnav">
-  <a class="active" href="admin.html">Admin</a>
-  <a class="" href="names.html">Namen</a>
-  <a class="" href="scoreboard.html">Scoreboard</a>
-  <a href="index.html">Menu</a>
-</div>
-
 <h1>🎤 Eurovision Admin</h1>
 
 <div class="panel">
@@ -42,25 +29,14 @@ select,input{padding:10px;border-radius:10px;font-size:16px;margin:5px;border:no
 </div>
 
 <div class="panel">
-<h2>Publieksronde</h2>
-<div class="current">Nu aan de beurt: <b id="currentPublic">-</b></div>
+<h2>Punten ingeven (handmatig totaal)</h2>
 <div class="row">
-<select id="publicTarget"></select>
-<select id="publicPoints"></select>
-<button class="primary" onclick="addRoundPoints('public')">Publiekspunten geven</button>
-<button class="secondary" onclick="nextPublic()">Volgende beurt</button>
+<select id="scoreTarget"></select>
+<input id="scoreAmount" type="number" value="0" step="1" placeholder="Aantal punten">
+<button class="primary" onclick="addToTotal()">Punten optellen</button>
+<button class="secondary" onclick="setTotal()">Totaal instellen</button>
 </div>
-<p class="note">Ronde blijft zichtbaar, maar jij kiest zelf wie de punten krijgt.</p>
-</div>
-
-<div class="panel">
-<h2>Juryronde</h2>
-<div class="current">Jury aan zet: <b id="currentJury">Jury</b></div>
-<div class="row">
-<select id="juryTarget"></select>
-<select id="juryPoints"></select>
-<button class="primary" onclick="addRoundPoints('jury')">Jurypunten geven</button>
-</div>
+<p class="note">Gebruik deze modus als jij zelf alle punten optelt en daarna direct bij de juiste leerling zet.</p>
 </div>
 
 <div class="panel">
@@ -69,47 +45,48 @@ select,input{padding:10px;border-radius:10px;font-size:16px;margin:5px;border:no
 <button class="primary" onclick="window.open('scoreboard.html','_blank')">Open scorepagina</button>
 </div>
 
-<script>
-const state = {
-  contestants: [],
-  publicIndex: 0,
-  points:[1,2,3,4,5,6,7,8,10,12]
-};
 
-function save(){ localStorage.setItem('eurovisionData', JSON.stringify(state)); }
+<div class="panel">
+
+<h2>Presentatiepagina's</h2>
+
+<button class="primary" onclick="window.open('names.html','_blank')">
+Open namenpagina
+</button>
+
+<button class="primary" onclick="window.open('scoreboard.html','_blank')">
+Open scorepagina
+</button>
+
+<div class="panel">
+<h2>Presentatiepagina's</h2>
+<button class="primary" onclick="window.open('names.html','_blank')">Open namenpagina</button>
+<button class="primary" onclick="window.open('scoreboard.html','_blank')">Open scorepagina</button>
+</div>
+
+<script>
+const state = {contestants:[]};
+
+function save(){
+  localStorage.setItem('eurovisionData', JSON.stringify(state));
+}
 
 function load(){
   const data = localStorage.getItem('eurovisionData');
-  if(!data) return;
-  const parsed = JSON.parse(data);
-  state.contestants = parsed.contestants || [];
-  state.publicIndex = Number(parsed.publicIndex || 0);
-  state.points = Array.isArray(parsed.points) && parsed.points.length ? parsed.points : state.points;
+  if(data){
+    const parsed = JSON.parse(data);
+    state.contestants = parsed.contestants || [];
+  }
 }
 
-function renderSelects(){
-  ['publicTarget','juryTarget'].forEach(id=>{
-    const sel=document.getElementById(id);
-    sel.innerHTML='';
-    state.contestants.forEach((c,i)=>{
-      const o=document.createElement('option');
-      o.value=i;
-      o.textContent=c.name;
-      sel.appendChild(o);
-    });
-  });
-}
-
-function setupPoints(){
-  ['publicPoints','juryPoints'].forEach(id=>{
-    const sel=document.getElementById(id);
-    sel.innerHTML='';
-    state.points.forEach(p=>{
-      const o=document.createElement('option');
-      o.value=p;
-      o.textContent=p;
-      sel.appendChild(o);
-    });
+function renderSelect(){
+  const sel = document.getElementById('scoreTarget');
+  sel.innerHTML='';
+  state.contestants.forEach((c,i)=>{
+    const o=document.createElement('option');
+    o.value=i;
+    o.textContent=c.name;
+    sel.appendChild(o);
   });
 }
 
@@ -117,41 +94,31 @@ function loadNames(){
   const names=document.getElementById('namesInput').value
     .split('\n').map(n=>n.trim()).filter(Boolean).sort((a,b)=>a.localeCompare(b,'nl'));
 
-  state.contestants=names.map(name=>({name,public:0,jury:0,total:0}));
-  state.publicIndex=0;
-  renderSelects();
-  updateCurrent();
+  state.contestants=names.map(name=>({name,total:0}));
+  renderSelect();
   save();
   alert('Namen geladen!');
 }
 
-function updateCurrent(){
-  if(!state.contestants.length){
-    document.getElementById('currentPublic').textContent='-';
-    return;
-  }
-  const order=[...state.contestants].reverse();
-  document.getElementById('currentPublic').textContent = order[state.publicIndex] ? order[state.publicIndex].name : 'Publieksronde klaar';
+function getSelectedContestant(){
+  const idx = Number(document.getElementById('scoreTarget').value);
+  const points = Number(document.getElementById('scoreAmount').value);
+  if(Number.isNaN(idx) || !state.contestants[idx]) return null;
+  if(Number.isNaN(points)) return null;
+  return {person: state.contestants[idx], points};
 }
 
-function nextPublic(){
-  state.publicIndex++;
-  updateCurrent();
+function addToTotal(){
+  const selected = getSelectedContestant();
+  if(!selected) return;
+  selected.person.total = Number(selected.person.total || 0) + selected.points;
   save();
 }
 
-function addRoundPoints(type){
-  const target = Number(document.getElementById(type==='public' ? 'publicTarget' : 'juryTarget').value);
-  const points = Number(document.getElementById(type==='public' ? 'publicPoints' : 'juryPoints').value);
-  const person = state.contestants[target];
-  if(!person || Number.isNaN(points)) return;
-
-  if(type==='public'){
-    person.public = Number(person.public || 0) + points;
-  }else{
-    person.jury = Number(person.jury || 0) + points;
-  }
-  person.total = Number(person.public || 0) + Number(person.jury || 0);
+function setTotal(){
+  const selected = getSelectedContestant();
+  if(!selected) return;
+  selected.person.total = selected.points;
   save();
 }
 
@@ -161,9 +128,7 @@ function resetAll(){
 }
 
 load();
-setupPoints();
-renderSelects();
-updateCurrent();
+renderSelect();
 </script>
 </body>
 </html>

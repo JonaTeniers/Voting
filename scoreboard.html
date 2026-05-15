@@ -9,115 +9,49 @@
 *{box-sizing:border-box}
 body{margin:0;font-family:Arial,sans-serif;background:radial-gradient(circle at top,var(--bg2),var(--bg1));color:#fff;min-height:100vh;overflow:hidden}
 .container{width:min(1200px,94vw);margin:auto;padding-top:24px}
-.header{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-bottom:14px}
+.header{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-bottom:18px}
 .title{font-size:clamp(30px,5vw,56px);font-weight:900;letter-spacing:.8px;text-shadow:0 8px 30px rgba(255,0,204,.35)}
 .live{background:linear-gradient(90deg,#ff2679,#ff47d0);padding:10px 14px;border-radius:999px;font-weight:800}
-.controls{display:flex;gap:8px;flex-wrap:wrap;align-items:center;background:rgba(255,255,255,.08);padding:10px;border-radius:12px;margin-bottom:12px}
-.controls select,.controls button{border:none;border-radius:10px;padding:10px 12px;font-size:16px}
-.controls button{background:#ff00cc;color:#fff;font-weight:700;cursor:pointer}
-.controls .secondary{background:#4d3a67}
-.current{font-weight:700;margin-right:8px}
-.board{display:flex;flex-direction:column;gap:10px;max-height:65vh;overflow:auto;padding-right:6px}
+.board{display:flex;flex-direction:column;gap:10px;max-height:78vh;overflow:auto;padding-right:6px}
 .row{display:grid;grid-template-columns:84px 1fr 130px;align-items:stretch;border-radius:16px;overflow:hidden;animation:reveal .5s ease both;box-shadow:0 10px 30px rgba(0,0,0,.25)}
 .rank{background:linear-gradient(180deg,#7b2cff,var(--rank));padding:16px;text-align:center;font-weight:900;font-size:26px}
 .name{background:linear-gradient(90deg,#c100ff,var(--name));padding:16px 20px;font-size:28px;font-weight:800}
 .points{background:var(--pts);color:var(--ink);padding:16px;text-align:center;font-size:34px;font-weight:900}
-.row.active{outline:4px solid #fff36c;transform:scale(1.01)}
 .row.top-1 .rank,.row.top-1 .name{background:linear-gradient(90deg,#ff9f1c,#ffd166);color:#3b2100}
 .row.top-2 .rank,.row.top-2 .name{background:linear-gradient(90deg,#b8c4d6,#edf2f4);color:#1d2736}
 .row.top-3 .rank,.row.top-3 .name{background:linear-gradient(90deg,#c97a40,#f4a261);color:#261207}
 @keyframes reveal{from{opacity:0;transform:translateX(-25px)}to{opacity:1;transform:translateX(0)}}
 .empty{padding:42px;text-align:center;background:rgba(255,255,255,.08);border-radius:16px;font-size:24px}
-.topnav{position:sticky;top:0;z-index:20;display:flex;gap:8px;flex-wrap:wrap;padding:10px;margin:0 0 12px;background:rgba(7,2,13,.55);backdrop-filter:blur(6px);border-radius:12px}
-.topnav a{text-decoration:none;color:#fff;padding:8px 12px;border-radius:999px;background:rgba(255,255,255,.12);font-weight:700}
-.topnav a.active{background:linear-gradient(90deg,#ff2fcf,#7300ff)}
 </style>
 </head>
 <body>
-<div class="topnav">
-  <a href="admin.html">Admin</a>
-  <a href="names.html">Namen</a>
-  <a class="active" href="scoreboard.html">Scoreboard</a>
-  <a href="index.html">Menu</a>
-</div>
 <div class="container">
-  <div class="header"><div class="title">🏆 LIVE SCOREBOARD</div><div class="live">EUROVISION STYLE</div></div>
-  <div class="controls">
-    <span class="current">Aan de beurt: <b id="currentName">-</b></span>
-    <select id="pointSelect"></select>
-    <button onclick="givePoints()">Geef punten</button>
-    <button class="secondary" onclick="nextFromBottom()">Volgende (van onder)</button>
-    <button class="secondary" onclick="resetTurnOrder()">Reset beurtvolgorde</button>
+  <div class="header">
+    <div class="title">🏆 LIVE SCOREBOARD</div>
+    <div class="live">EUROVISION STYLE</div>
   </div>
   <div class="board" id="board"></div>
 </div>
 <script>
-const SCORE_VALUES=[1,2,3,4,5,6,7,8,10,12];
-function readData(){
-  const raw=localStorage.getItem('eurovisionData');
-  if(!raw) return {contestants:[],currentBottomIndex:0};
-  const d=JSON.parse(raw);
-  d.contestants=d.contestants||[];
-  d.currentBottomIndex=Number(d.currentBottomIndex||0);
-  return d;
-}
-function writeData(data){localStorage.setItem('eurovisionData',JSON.stringify(data));}
-function getSorted(data){return [...data.contestants].sort((a,b)=>b.total-a.total||a.name.localeCompare(b.name,'nl'));}
-function syncCurrentLabel(data,sorted){
-  const target=sorted[sorted.length-1-data.currentBottomIndex];
-  document.getElementById('currentName').textContent=target?target.name:'Klaar';
-}
-function renderPointSelect(){
-  const sel=document.getElementById('pointSelect');
-  sel.innerHTML='';
-  SCORE_VALUES.forEach(v=>{const o=document.createElement('option');o.value=v;o.textContent=v;sel.appendChild(o);});
-  sel.value='12';
-}
 function loadBoard(){
-  const data=readData();
-  const sorted=getSorted(data);
+  const data=JSON.parse(localStorage.getItem('eurovisionData'));
   const board=document.getElementById('board');
   board.innerHTML='';
-  if(!sorted.length){board.innerHTML='<div class="empty">Nog geen scoredata beschikbaar.</div>';document.getElementById('currentName').textContent='-';return;}
-  const activeIndex=sorted.length-1-data.currentBottomIndex;
+  if(!data || !data.contestants || data.contestants.length===0){
+    board.innerHTML='<div class="empty">Nog geen scoredata beschikbaar.</div>';
+    return;
+  }
+  const sorted=[...data.contestants].sort((a,b)=>b.total-a.total||a.name.localeCompare(b.name,'nl'));
   sorted.forEach((c,i)=>{
     const row=document.createElement('div');
-    row.className=`row ${i===0?'top-1':i===1?'top-2':i===2?'top-3':''} ${i===activeIndex?'active':''}`;
-    row.innerHTML=`<div class="rank">${String(i+1).padStart(2,'0')}</div><div class="name">${c.name}</div><div class="points">${c.total||0}</div>`;
+    row.className=`row ${i===0?'top-1':i===1?'top-2':i===2?'top-3':''}`;
+    row.style.animationDelay=`${i*0.05}s`;
+    row.innerHTML=`<div class="rank">${String(i+1).padStart(2,'0')}</div><div class="name">${c.name}</div><div class="points">${c.total}</div>`;
     board.appendChild(row);
   });
-  syncCurrentLabel(data,sorted);
 }
-function givePoints(){
-  const data=readData();
-  const sorted=getSorted(data);
-  const idx=sorted.length-1-data.currentBottomIndex;
-  const target=sorted[idx];
-  if(!target) return;
-  const add=Number(document.getElementById('pointSelect').value);
-  const original=data.contestants.find(c=>c.name===target.name);
-  if(!original) return;
-  original.public=Number(original.public||0)+add;
-  original.total=Number(original.total||0)+add;
-  writeData(data);
-  loadBoard();
-}
-function nextFromBottom(){
-  const data=readData();
-  const max=Math.max(0,data.contestants.length-1);
-  data.currentBottomIndex=Math.min(max,Number(data.currentBottomIndex||0)+1);
-  writeData(data);
-  loadBoard();
-}
-function resetTurnOrder(){
-  const data=readData();
-  data.currentBottomIndex=0;
-  writeData(data);
-  loadBoard();
-}
-renderPointSelect();
 loadBoard();
-setInterval(loadBoard,1200);
+setInterval(loadBoard,1000);
 </script>
 </body>
 </html>
