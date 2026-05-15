@@ -5,209 +5,102 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Eurovision Klas Voting</title>
   <style>
-    :root {
-      --bg1: #09091d;
-      --bg2: #1e114f;
-      --pink: #ff2fb0;
-      --blue: #3fd1ff;
-      --purple: #7f5cff;
-      --card: rgba(255, 255, 255, 0.1);
-      --text: #f8f7ff;
-      --muted: #d7d6f7;
-      font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
-    }
-
-    body {
-      margin: 0;
-      color: var(--text);
-      background: radial-gradient(circle at top right, #2b1379 0%, transparent 40%),
-                  radial-gradient(circle at bottom left, #0b5eb6 0%, transparent 35%),
-                  linear-gradient(135deg, var(--bg1), var(--bg2));
-      min-height: 100vh;
-    }
-
-    .container {
-      max-width: 1100px;
-      margin: 0 auto;
-      padding: 1.2rem;
-    }
-
-    h1 {
-      margin: 0 0 .6rem;
-      text-transform: uppercase;
-      letter-spacing: .05em;
-      text-shadow: 0 0 16px rgba(63, 209, 255, .5);
-    }
-
-    .subtitle { color: var(--muted); margin-bottom: 1rem; }
-
-    .tabs { display: flex; gap: .55rem; flex-wrap: wrap; margin-bottom: 1rem; }
-
-    .tab {
-      border: 1px solid rgba(255, 255, 255, .35);
-      padding: .6rem .95rem;
-      border-radius: 999px;
-      cursor: pointer;
-      background: rgba(255, 255, 255, .05);
-      color: white;
-      font-weight: 600;
-    }
-
-    .tab.active {
-      background: linear-gradient(90deg, var(--pink), var(--purple));
-      border-color: transparent;
-      box-shadow: 0 0 20px rgba(255, 47, 176, .45);
-    }
-
-    .panel {
-      display: none;
-      background: var(--card);
-      border: 1px solid rgba(255,255,255,.18);
-      border-radius: 16px;
-      padding: 1rem;
-      backdrop-filter: blur(6px);
-      box-shadow: 0 6px 20px rgba(0,0,0,.3);
-    }
-
+    :root { font-family: Arial, sans-serif; color-scheme: light; }
+    body { margin: 0; background: #f7f7ff; color: #1d1d2e; }
+    .container { max-width: 1000px; margin: 0 auto; padding: 1rem; }
+    h1 { margin-top: 0; }
+    .tabs { display: flex; gap: .5rem; margin-bottom: 1rem; }
+    .tab { border: none; padding: .65rem 1rem; border-radius: 8px; cursor: pointer; background: #ddd; }
+    .tab.active { background: #5b4bff; color: white; }
+    .panel { display: none; background: white; border-radius: 12px; padding: 1rem; box-shadow: 0 4px 10px rgba(0,0,0,.08); }
     .panel.active { display: block; }
-
-    .row { display: flex; flex-wrap: wrap; align-items: center; gap: .7rem; margin-top: .6rem; }
-
-    textarea, select, button {
-      border-radius: 10px;
-      border: 1px solid rgba(255,255,255,.25);
-      padding: .55rem .7rem;
-      font-size: .96rem;
-    }
-
-    textarea {
-      width: 100%;
-      min-height: 180px;
-      background: rgba(0,0,0,.2);
-      color: white;
-    }
-
-    select {
-      background: rgba(0,0,0,.2);
-      color: white;
-    }
-
-    button { cursor: pointer; font-weight: 600; }
-
-    .primary {
-      border: none;
-      background: linear-gradient(90deg, var(--blue), var(--purple));
-      color: white;
-    }
-
-    .secondary {
-      background: rgba(255,255,255,.08);
-      color: white;
-    }
-
-    .hint { color: var(--muted); font-size: .9rem; }
-
-    .current {
-      margin-top: .5rem;
-      padding: .8rem;
-      border-radius: 12px;
-      border: 1px solid rgba(63, 209, 255, .4);
-      background: rgba(63, 209, 255, .08);
-    }
-
-    .big { font-size: 1.2rem; font-weight: 700; }
-
-    table { width: 100%; border-collapse: collapse; margin-top: .4rem; }
-    th, td { padding: .6rem; border-bottom: 1px solid rgba(255,255,255,.14); text-align: left; }
-    th { color: #bfefff; }
-    .leader { color: #ffe88f; font-weight: 800; }
-
-    .alphabet-list {
-      margin-top: .8rem;
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
-      gap: .5rem;
-    }
-
-    .name-chip {
-      background: rgba(255,255,255,.07);
-      border: 1px solid rgba(255,255,255,.2);
-      border-radius: 999px;
-      padding: .45rem .7rem;
-      font-size: .93rem;
-    }
+    textarea { width: 100%; min-height: 180px; }
+    .row { display: flex; flex-wrap: wrap; gap: .8rem; align-items: center; }
+    select, button { padding: .5rem; border-radius: 8px; }
+    button.primary { background: #5b4bff; color: white; border: none; cursor: pointer; }
+    button.secondary { background: #ecebff; border: 1px solid #bbb7ff; cursor: pointer; }
+    table { width: 100%; border-collapse: collapse; margin-top: 1rem; }
+    th, td { padding: .55rem; border-bottom: 1px solid #ececec; text-align: left; }
+    .hint { font-size: .9rem; color: #4a4a68; }
+    .big { font-size: 1.1rem; font-weight: bold; }
+    .current { background: #fff5d6; border-radius: 8px; padding: .75rem; margin: .5rem 0; }
   </style>
 </head>
 <body>
   <div class="container">
-    <h1>Eurovision Klas Voting</h1>
-    <div class="subtitle">Leerlingen = publiek, jij = jury. Alles live zoals bij Eurovision ✨</div>
-
+    <h1>Eurovision punten voor de klas</h1>
     <div class="tabs">
-      <button class="tab active" data-panel="namen">Namen</button>
-      <button class="tab" data-panel="leerlingen">Publiek</button>
-      <button class="tab" data-panel="jury">Jury</button>
-      <button class="tab" data-panel="score">Scorebord</button>
+      <button class="tab active" data-panel="namen">Namen ingeven</button>
+      <button class="tab" data-panel="leerlingen">Publiek (leerlingen)</button>
+      <button class="tab" data-panel="jury">Jury (jij)</button>
     </div>
 
     <section id="namen" class="panel active">
-      <h2>1) Namen ingeven</h2>
-      <p class="hint">Één naam per lijn. De lijst hieronder staat alfabetisch (A→Z).</p>
-      <textarea id="namesInput" placeholder="Bijv.&#10;Amina&#10;Bram&#10;Youssef"></textarea>
+      <h2>1) Namen toevoegen</h2>
+      <p class="hint">Zet één naam per regel. De lijst start alfabetisch. Stemvolgorde start onderaan (van Z naar A).</p>
+      <textarea id="namesInput" placeholder="Bijv.&#10;Anas&#10;Bram&#10;Chloé"></textarea>
       <div class="row">
         <button class="primary" id="loadNames">Namen laden</button>
         <button class="secondary" id="resetAll">Alles resetten</button>
       </div>
-      <div id="nameList" class="alphabet-list"></div>
     </section>
 
     <section id="leerlingen" class="panel">
-      <h2>2) Publiekspunten (leerlingen)</h2>
-      <p class="hint">Volgorde van spreken: onderaan alfabet (Z→A). Publiekspunten tellen meteen op.</p>
+      <h2>2) Leerlingen geven punten</h2>
+      <p class="hint">Eerst alle publieksstemmen verzamelen. Deze punten tellen direct mee in het totaal.</p>
       <div class="current">
         <div class="big">Nu aan de beurt: <span id="currentPublic">-</span></div>
+        <div class="hint">Volgorde: onder naar boven (laatste alfabetisch eerst).</div>
       </div>
       <div class="row">
         <label>Geef punten aan:</label>
         <select id="publicTarget"></select>
         <label>Punten:</label>
         <select id="publicPoints"></select>
-        <button class="primary" id="submitPublic">Punten toevoegen</button>
+        <button class="primary" id="submitPublic">Publiekspunt toevoegen</button>
       </div>
-      <div class="row">
+      <div class="row" style="margin-top:.5rem">
         <button class="secondary" id="nextPublic">Volgende leerling</button>
       </div>
     </section>
 
     <section id="jury" class="panel">
-      <h2>3) Jury-punten (leerkracht)</h2>
-      <p class="hint">Pas starten nadat de publieksronde klaar is.</p>
+      <h2>3) Jury geeft punten</h2>
+      <p class="hint">Pas gebruiken als de leerlingen klaar zijn. Jury-punten worden daarna toegevoegd.</p>
       <div class="row">
         <label>Jury geeft aan:</label>
         <select id="juryTarget"></select>
         <label>Punten:</label>
         <select id="juryPoints"></select>
-        <button class="primary" id="submitJury">Jury-punten toevoegen</button>
+        <button class="primary" id="submitJury">Jurypunt toevoegen</button>
       </div>
     </section>
 
-    <section id="score" class="panel">
-      <h2>4) Live scorebord</h2>
+    <section class="panel active" style="margin-top:1rem; display:block;">
+      <h2>Live klassement</h2>
       <table>
-        <thead><tr><th>#</th><th>Naam</th><th>Publiek</th><th>Jury</th><th>Totaal</th></tr></thead>
+        <thead>
+          <tr><th>#</th><th>Naam</th><th>Publiek</th><th>Jury</th><th>Totaal</th></tr>
+        </thead>
         <tbody id="scoreTable"></tbody>
       </table>
     </section>
   </div>
 
   <script>
-    const state = { contestants: [], publicIndex: 0, publicFinished: false, pointsOptions: [1,2,3,4,5,6,7,8,10,12] };
+    const state = {
+      contestants: [],
+      publicIndex: 0,
+      publicFinished: false,
+      pointsOptions: [1,2,3,4,5,6,7,8,10,12]
+    };
+
     const el = (id) => document.getElementById(id);
 
     function setupPointSelects() {
-      [el('publicPoints'), el('juryPoints')].forEach((sel) => {
+      [el('publicPoints'), el('juryPoints')].forEach(sel => {
         sel.innerHTML = '';
-        state.pointsOptions.forEach((p) => {
+        state.pointsOptions.forEach(p => {
           const o = document.createElement('option');
           o.value = p;
           o.textContent = p;
@@ -217,19 +110,15 @@
     }
 
     function normalizeNames(raw) {
-      return raw.split('\n').map((n) => n.trim()).filter(Boolean).sort((a, b) => a.localeCompare(b, 'nl', { sensitivity: 'base' }));
-    }
-
-    function renderNameList() {
-      if (!state.contestants.length) {
-        el('nameList').innerHTML = '<span class="hint">Nog geen namen geladen.</span>';
-        return;
-      }
-      el('nameList').innerHTML = state.contestants.map((c) => `<div class="name-chip">${c.name}</div>`).join('');
+      return raw
+        .split('\n')
+        .map(n => n.trim())
+        .filter(Boolean)
+        .sort((a, b) => a.localeCompare(b, 'nl', { sensitivity: 'base' }));
     }
 
     function renderTargets() {
-      [el('publicTarget'), el('juryTarget')].forEach((sel) => {
+      [el('publicTarget'), el('juryTarget')].forEach(sel => {
         sel.innerHTML = '';
         state.contestants.forEach((c, idx) => {
           const o = document.createElement('option');
@@ -241,22 +130,31 @@
     }
 
     function ranked() {
-      return [...state.contestants].sort((a, b) => (b.total - a.total) || a.name.localeCompare(b.name, 'nl', { sensitivity: 'base' }));
+      return [...state.contestants].sort((a,b) => {
+        if (b.total !== a.total) return b.total - a.total;
+        return a.name.localeCompare(b.name, 'nl', { sensitivity: 'base' });
+      });
     }
 
     function renderTable() {
-      const rows = ranked().map((c, i) => `<tr><td>${i + 1}</td><td class="${i===0 ? 'leader' : ''}">${c.name}</td><td>${c.public}</td><td>${c.jury}</td><td><b>${c.total}</b></td></tr>`).join('');
-      el('scoreTable').innerHTML = rows || '<tr><td colspan="5">Nog geen scores.</td></tr>';
+      const rows = ranked().map((c, i) =>
+        `<tr><td>${i+1}</td><td>${c.name}</td><td>${c.public}</td><td>${c.jury}</td><td><b>${c.total}</b></td></tr>`
+      ).join('');
+      el('scoreTable').innerHTML = rows || '<tr><td colspan="5">Nog geen namen geladen.</td></tr>';
     }
 
     function updateCurrentPublic() {
-      if (!state.contestants.length) return el('currentPublic').textContent = '-';
-      if (state.publicIndex >= state.contestants.length) {
-        state.publicFinished = true;
-        el('currentPublic').textContent = 'Publieksronde klaar';
+      if (!state.contestants.length) {
+        el('currentPublic').textContent = '-';
         return;
       }
-      el('currentPublic').textContent = [...state.contestants].reverse()[state.publicIndex].name;
+      if (state.publicIndex >= state.contestants.length) {
+        el('currentPublic').textContent = 'Klaar met publieksronde';
+        state.publicFinished = true;
+        return;
+      }
+      const order = [...state.contestants].reverse();
+      el('currentPublic').textContent = order[state.publicIndex].name;
     }
 
     function addPoints(type) {
@@ -266,11 +164,13 @@
 
       const target = Number(el(isPublic ? 'publicTarget' : 'juryTarget').value);
       const points = Number(el(isPublic ? 'publicPoints' : 'juryPoints').value);
-      if (!state.contestants[target]) return;
+      const person = state.contestants[target];
+      if (!person) return;
 
-      if (isPublic) state.contestants[target].public += points;
-      else state.contestants[target].jury += points;
-      state.contestants[target].total = state.contestants[target].public + state.contestants[target].jury;
+      if (isPublic) person.public += points;
+      else person.jury += points;
+      person.total = person.public + person.jury;
+
       renderTable();
     }
 
@@ -283,13 +183,14 @@
     el('loadNames').addEventListener('click', () => {
       const names = normalizeNames(el('namesInput').value);
       if (!names.length) return alert('Geef minstens 1 naam in.');
-      state.contestants = names.map((name) => ({ name, public: 0, jury: 0, total: 0 }));
+
+      state.contestants = names.map(name => ({ name, public: 0, jury: 0, total: 0 }));
       state.publicIndex = 0;
       state.publicFinished = false;
-      renderNameList();
       renderTargets();
       renderTable();
       updateCurrentPublic();
+      alert('Namen geladen!');
     });
 
     el('resetAll').addEventListener('click', () => {
@@ -297,7 +198,6 @@
       state.publicIndex = 0;
       state.publicFinished = false;
       el('namesInput').value = '';
-      renderNameList();
       renderTargets();
       renderTable();
       updateCurrentPublic();
@@ -307,17 +207,16 @@
     el('submitJury').addEventListener('click', () => addPoints('jury'));
     el('nextPublic').addEventListener('click', nextPublicSpeaker);
 
-    document.querySelectorAll('.tab').forEach((btn) => {
+    document.querySelectorAll('.tab').forEach(btn => {
       btn.addEventListener('click', () => {
-        document.querySelectorAll('.tab').forEach((b) => b.classList.remove('active'));
-        document.querySelectorAll('.panel').forEach((p) => p.classList.remove('active'));
+        document.querySelectorAll('.tab').forEach(b => b.classList.remove('active'));
+        document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
         btn.classList.add('active');
         el(btn.dataset.panel).classList.add('active');
       });
     });
 
     setupPointSelects();
-    renderNameList();
     renderTable();
     updateCurrentPublic();
   </script>
