@@ -1,6 +1,6 @@
 # Voting
 
-Eurovision-stijl webapp voor een klassikale puntenronde.
+Eenvoudige webapp voor een klassikale Eurovision-puntenronde.
 
 ## Starten
 
@@ -9,14 +9,8 @@ Open `index.html` in je browser.
 ## Werking
 
 1. In **Namen** voeg je leerlingen toe (één per regel).
-2. Namen staan alfabetisch met kandidaatnummer.
-3. In **Publiek** stem je in volgorde Z→A.
-4. Je typt kandidaatnummer + punten op het toetsenbord en drukt **Enter**.
-5. De punten verschijnen pas na **2 seconden vertraging** voor extra spanning.
-6. Na de publieksronde geef je in **Jury** op dezelfde manier je jury-punten.
-7. In **Scorebord** zie je live ranking met aparte publiek/jury punten en totaal.
-
-## Sneltoetsen
-
-- **Enter** in puntenveld: punten toevoegen met 2s vertraging.
-- **N** in Publiek-tab: volgende leerling aan de beurt.
+2. Namen worden alfabetisch getoond in de namentab.
+3. In **Publiek** start de beurtvolgorde onderaan de alfabetische lijst (Z→A).
+4. Publiekspunten tellen meteen mee in het totaal.
+5. Pas daarna gebruik je **Jury** om je eigen punten toe te voegen.
+6. In **Scorebord** zie je live ranking met aparte publiek/jury punten en totaal.
