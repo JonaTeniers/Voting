@@ -1,0 +1,313 @@
+<!-- =========================
+BESTAND 1 = admin.html
+========================= -->
+
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Eurovision Admin</title>
+
+<style>
+
+body{
+    margin:0;
+    font-family:Arial;
+    background:#12051f;
+    color:white;
+    padding:20px;
+}
+
+h1{
+    text-align:center;
+    color:#ff4dff;
+}
+
+.panel{
+    background:#1d1033;
+    padding:20px;
+    border-radius:15px;
+    margin-bottom:20px;
+}
+
+textarea{
+    width:100%;
+    height:180px;
+    border:none;
+    border-radius:10px;
+    padding:10px;
+    font-size:16px;
+}
+
+button{
+    padding:12px 20px;
+    border:none;
+    border-radius:10px;
+    cursor:pointer;
+    font-size:16px;
+    margin-top:10px;
+}
+
+.primary{
+    background:#ff00cc;
+    color:white;
+}
+
+.secondary{
+    background:#444;
+    color:white;
+}
+
+select{
+    padding:10px;
+    border-radius:10px;
+    font-size:16px;
+    margin:5px;
+}
+
+.row{
+    margin-top:10px;
+}
+
+.current{
+    background:#2d1650;
+    padding:15px;
+    border-radius:10px;
+    margin-top:10px;
+}
+
+</style>
+</head>
+
+<body>
+
+<h1>🎤 Eurovision Admin</h1>
+
+<div class="panel">
+
+<h2>Leerlingen toevoegen</h2>
+
+<textarea id="namesInput" placeholder="1 naam per regel"></textarea>
+
+<br>
+
+<button class="primary" onclick="loadNames()">
+Namen laden
+</button>
+
+<button class="secondary" onclick="resetAll()">
+Reset
+</button>
+
+</div>
+
+<div class="panel">
+
+<h2>Publiekspunten</h2>
+
+<div class="current">
+Nu aan de beurt:
+<b id="currentPublic">-</b>
+</div>
+
+<div class="row">
+
+<select id="publicTarget"></select>
+
+<select id="publicPoints"></select>
+
+<button class="primary" onclick="addPoints('public')">
+Punten toevoegen
+</button>
+
+<button class="secondary" onclick="nextPublic()">
+Volgende leerling
+</button>
+
+</div>
+
+</div>
+
+<div class="panel">
+
+<h2>Jurypunten</h2>
+
+<div class="row">
+
+<select id="juryTarget"></select>
+
+<select id="juryPoints"></select>
+
+<button class="primary" onclick="addPoints('jury')">
+Jurypunten geven
+</button>
+
+</div>
+
+</div>
+
+<script>
+
+const state = {
+    contestants: [],
+    publicIndex: 0,
+    points:[1,2,3,4,5,6,7,8,10,12]
+};
+
+function save(){
+    localStorage.setItem("eurovisionData", JSON.stringify(state));
+}
+
+function load(){
+    const data = localStorage.getItem("eurovisionData");
+
+    if(data){
+        Object.assign(state, JSON.parse(data));
+    }
+}
+
+function renderSelects(){
+
+    const selects = [
+        document.getElementById("publicTarget"),
+        document.getElementById("juryTarget")
+    ];
+
+    selects.forEach(sel=>{
+
+        sel.innerHTML="";
+
+        state.contestants.forEach((c,i)=>{
+
+            const o=document.createElement("option");
+            o.value=i;
+            o.textContent=c.name;
+
+            sel.appendChild(o);
+
+        });
+
+    });
+
+}
+
+function setupPoints(){
+
+    ["publicPoints","juryPoints"].forEach(id=>{
+
+        const sel=document.getElementById(id);
+
+        state.points.forEach(p=>{
+
+            const o=document.createElement("option");
+
+            o.value=p;
+            o.textContent=p;
+
+            sel.appendChild(o);
+
+        });
+
+    });
+
+}
+
+function loadNames(){
+
+    const raw=document.getElementById("namesInput").value;
+
+    const names=raw
+        .split("\n")
+        .map(n=>n.trim())
+        .filter(Boolean)
+        .sort();
+
+    state.contestants=names.map(name=>({
+        name,
+        public:0,
+        jury:0,
+        total:0
+    }));
+
+    state.publicIndex=0;
+
+    renderSelects();
+
+    updateCurrent();
+
+    save();
+
+    alert("Namen geladen!");
+
+}
+
+function updateCurrent(){
+
+    const order=[...state.contestants].reverse();
+
+    if(order[state.publicIndex]){
+        document.getElementById("currentPublic").textContent=
+            order[state.publicIndex].name;
+    }else{
+        document.getElementById("currentPublic").textContent=
+            "Publieksronde klaar";
+    }
+
+}
+
+function nextPublic(){
+
+    state.publicIndex++;
+
+    updateCurrent();
+
+    save();
+
+}
+
+function addPoints(type){
+
+    const target=document.getElementById(
+        type==="public" ? "publicTarget" : "juryTarget"
+    ).value;
+
+    const points=document.getElementById(
+        type==="public" ? "publicPoints" : "juryPoints"
+    ).value;
+
+    const person=state.contestants[target];
+
+    if(type==="public"){
+        person.public += Number(points);
+    }else{
+        person.jury += Number(points);
+    }
+
+    person.total=person.public+person.jury;
+
+    save();
+
+}
+
+function resetAll(){
+
+    localStorage.removeItem("eurovisionData");
+
+    location.reload();
+
+}
+
+load();
+
+setupPoints();
+
+renderSelects();
+
+updateCurrent();
+
+</script>
+
+</body>
+</html>
