@@ -1,0 +1,156 @@
+<!-- =========================
+BESTAND 2 = scoreboard.html
+========================= -->
+
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+
+<meta charset="UTF-8">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Eurovision Scoreboard</title>
+
+<style>
+
+body{
+    margin:0;
+    font-family:Arial;
+    background:
+    radial-gradient(circle at top,#401060,#12051f);
+    color:white;
+    overflow:hidden;
+}
+
+.container{
+    width:90%;
+    margin:auto;
+    padding-top:30px;
+}
+
+.title{
+    text-align:center;
+    font-size:50px;
+    font-weight:bold;
+    margin-bottom:30px;
+    color:white;
+}
+
+.board{
+    display:flex;
+    flex-direction:column;
+    gap:10px;
+}
+
+.row{
+    display:flex;
+    align-items:center;
+    animation:fade .5s;
+}
+
+.rank{
+    width:70px;
+    background:#5a189a;
+    padding:15px;
+    text-align:center;
+    font-weight:bold;
+    font-size:24px;
+}
+
+.name{
+    flex:1;
+    background:#d000ff;
+    padding:15px;
+    font-size:24px;
+}
+
+.points{
+    width:120px;
+    background:white;
+    color:black;
+    padding:15px;
+    text-align:center;
+    font-size:28px;
+    font-weight:bold;
+}
+
+@keyframes fade{
+    from{
+        opacity:0;
+        transform:translateY(10px);
+    }
+
+    to{
+        opacity:1;
+        transform:translateY(0);
+    }
+}
+
+</style>
+
+</head>
+
+<body>
+
+<div class="container">
+
+<div class="title">
+🎤 EUROVISION CLASS VOTING
+</div>
+
+<div class="board" id="board"></div>
+
+</div>
+
+<script>
+
+function loadBoard(){
+
+    const data=JSON.parse(
+        localStorage.getItem("eurovisionData")
+    );
+
+    if(!data || !data.contestants) return;
+
+    const sorted=[...data.contestants]
+    .sort((a,b)=>b.total-a.total);
+
+    const board=document.getElementById("board");
+
+    board.innerHTML="";
+
+    sorted.forEach((c,i)=>{
+
+        board.innerHTML += `
+
+        <div class="row">
+
+            <div class="rank">
+                ${String(i+1).padStart(2,"0")}
+            </div>
+
+            <div class="name">
+                ${c.name}
+            </div>
+
+            <div class="points">
+                ${c.total}
+            </div>
+
+        </div>
+
+        `;
+
+    });
+
+}
+
+loadBoard();
+
+setInterval(loadBoard,1000);
+
+</script>
+
+</body>
+</html>
