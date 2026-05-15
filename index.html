@@ -18,7 +18,7 @@
     .row { display: flex; flex-wrap: wrap; gap: .8rem; align-items: center; }
     select, button { padding: .5rem; border-radius: 8px; }
     button.primary { background: #5b4bff; color: white; border: none; cursor: pointer; }
-    button.secondary { background: #ecebff; border: 1px solid #bbb7ff; cursor: pointer; }
+    button.secondary, a.secondary { background: #ecebff; border: 1px solid #bbb7ff; cursor: pointer; color:#1d1d2e; }
     table { width: 100%; border-collapse: collapse; margin-top: 1rem; }
     th, td { padding: .55rem; border-bottom: 1px solid #ececec; text-align: left; }
     .hint { font-size: .9rem; color: #4a4a68; }
@@ -29,6 +29,10 @@
 <body>
   <div class="container">
     <h1>Eurovision punten voor de klas</h1>
+    <nav class="row" style="margin-bottom:1rem; gap:.6rem;">
+      <a class="secondary" href="./admin.html" style="text-decoration:none;display:inline-block;">Open Admin-pagina</a>
+      <a class="secondary" href="./scoreboard.html" style="text-decoration:none;display:inline-block;">Open Scoreboard-pagina</a>
+    </nav>
     <div class="tabs">
       <button class="tab active" data-panel="namen">Namen ingeven</button>
       <button class="tab" data-panel="leerlingen">Publiek (leerlingen)</button>
